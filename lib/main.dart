@@ -23,6 +23,7 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
   List files = [];
+  bool isSignedIn = false;
   bool loading = false;
   final gdriveServices = GoogleDriveService();
 
@@ -32,19 +33,26 @@ class _HomeState extends State<Home> {
     final fileList = await gdriveServices.listDriveFiles();
 
     setState(() {
+      isSignedIn = true;
       files = fileList;
       loading = false;
     });
   }
 
   @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: loading
             ? const CircularProgressIndicator()
+            : !isSignedIn
+            ? TextButton(
+                onPressed: loadFiles,
+                child: const Text("Sign In with Google"),
+              )
             : files.isEmpty
-            ? TextButton(onPressed: loadFiles, child: const Text("Sign In"))
+            ? const Text("No files found in Drive")
             : ListView.builder(
                 itemCount: files.length,
                 itemBuilder: (context, index) {
